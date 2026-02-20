@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fetchPNRStatus } from "../services/pnrapi";
+import stationData from "../components/stationdata.jsx";
+
+// Create a map for quick lookup
+const stationMap = {};
+if (stationData && stationData.stations) {
+  stationData.stations.forEach(station => {
+    if (station.code && station.name) {
+      stationMap[station.code.toUpperCase()] = station.name.toUpperCase();
+    }
+  });
+}
 import jsPDF from "jspdf";
 
 const PNRDetailsPage = () => {
@@ -49,6 +60,14 @@ const PNRDetailsPage = () => {
     return dateString;
   };
 
+  // Get full station name
+  const getStationName = (stationCode) => {
+    if (!stationCode) return "N/A";
+    const code = stationCode.toUpperCase();
+    const fullName = stationMap[code];
+    return fullName ? `${stationCode} (${fullName})` : stationCode;
+  };
+
   // Get status color class
   const getStatusColor = (status) => {
     if (status === "CNF" || status === "Confirmed") return "text-green-500";
@@ -78,8 +97,8 @@ const PNRDetailsPage = () => {
       doc.setFontSize(12);
       doc.text(`Train: ${data?.trainName || "N/A"} (${data?.trainNumber || "N/A"})`, 20, 50);
       doc.text(`Journey Date: ${formatDate(data?.dateOfJourney)}`, 20, 60);
-      doc.text(`From: ${data?.sourceStation || "N/A"} → To: ${data?.destinationStation || "N/A"}`, 20, 70);
-      doc.text(`Boarding: ${data?.boardingPoint || "N/A"}`, 20, 80);
+      doc.text(`From: ${getStationName(data?.sourceStation)} → To: ${getStationName(data?.destinationStation)}`, 20, 70);
+      doc.text(`Boarding: ${getStationName(data?.boardingPoint)}`, 20, 80);
       doc.text(`Class: ${data?.journeyClass || "N/A"} | Quota: ${data?.quota || "N/A"}`, 20, 90);
       doc.text(`Total Fare: ₹${data?.bookingFare || data?.ticketFare || "N/A"}`, 20, 100);
       
@@ -146,7 +165,7 @@ const PNRDetailsPage = () => {
     const shareText = `🚂 PNR Status: ${data?.pnrNumber || pnrNumber}
 Train: ${data?.trainName} (${data?.trainNumber})
 Journey: ${formatDate(data?.dateOfJourney)}
-From: ${data?.sourceStation} → To: ${data?.destinationStation}
+From: ${getStationName(data?.sourceStation)} → To: ${getStationName(data?.destinationStation)}
 Class: ${data?.journeyClass}
 Passengers: ${data?.numberOfpassenger}
 Total Fare: ₹${data?.bookingFare || data?.ticketFare}
@@ -302,9 +321,9 @@ Current Status: ${data?.passengerList?.map(p => p.currentStatusDetails).join(', 
               <div className="relative mb-8">
                 <div className="flex justify-between items-center">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-[#FFB500]">{data?.sourceStation || "N/A"}</p>
+                    <p className="text-2xl font-bold text-[#FFB500]">{getStationName(data?.sourceStation)}</p>
                     <p className="text-sm text-gray-300 mt-1">Source</p>
-                    <p className="text-xs text-gray-400">Boarding: {data?.boardingPoint || "N/A"}</p>
+                    <p className="text-xs text-gray-400">Boarding: {getStationName(data?.boardingPoint)}</p>
                   </div>
                   
                   <div className="flex-1 mx-4 relative">
@@ -315,9 +334,9 @@ Current Status: ${data?.passengerList?.map(p => p.currentStatusDetails).join(', 
                   </div>
                   
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-[#FFB500]">{data?.destinationStation || "N/A"}</p>
+                    <p className="text-2xl font-bold text-[#FFB500]">{getStationName(data?.destinationStation)}</p>
                     <p className="text-sm text-gray-300 mt-1">Destination</p>
-                    <p className="text-xs text-gray-400">Resv Upto: {data?.reservationUpto || "N/A"}</p>
+                    <p className="text-xs text-gray-400">Resv Upto: {getStationName(data?.reservationUpto)}</p>
                   </div>
                 </div>
               </div>
