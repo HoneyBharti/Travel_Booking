@@ -1,10 +1,21 @@
 import axios from 'axios';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const RAPID_API_KEY = import.meta.env.VITE_RAPID_API_KEY;
+const RAPID_API_HOST = import.meta.env.VITE_RAPID_API_HOST;
 
 export const fetchPNRStatus = async (pnrNumber) => {
   try {
-    const response = await axios.get(`${BACKEND_URL}/api/pnr/${pnrNumber}`);
+    console.log("fetching pnr status");
+    
+    const response = await axios.get(
+      `https://${RAPID_API_HOST}/getPNRStatus/${pnrNumber}`,
+      {
+        headers: {
+          'x-rapidapi-host': RAPID_API_HOST,
+          'x-rapidapi-key': RAPID_API_KEY
+        }
+      }
+    );
     return response.data;
   } catch (error) {
     console.error('Error fetching PNR status:', error);
