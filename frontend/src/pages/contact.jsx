@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import emailjs from 'emailjs-com';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ export default function ContactPage() {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,11 +23,31 @@ export default function ContactPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you would typically send the form data to a server
-    console.log('Form submitted:', formData);
-    setSubmitted(true);
-    setFormData({ name: '', email: '', message: '' });
-    setTimeout(() => setSubmitted(false), 5000);
+    setLoading(true);
+
+    emailjs.send(
+      'service_64vemhm',        // ✅ Service ID
+      'template_59x058j',       // ✅ Template ID
+      {
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+      },
+      'aUAcQLD3ru6kHstaK'        // ✅ Public Key ONLY
+    )
+    .then((result) => {
+      console.log('Email sent:', result.text);
+      setSubmitted(true);
+      setFormData({ name: '', email: '', message: '' });
+      setTimeout(() => setSubmitted(false), 5000);
+    })
+    .catch((error) => {
+      console.error('EmailJS Error:', error.text);
+      alert('Failed to send message. Please try again later.');
+    })
+    .finally(() => {
+      setLoading(false);
+    });
   };
 
   return (
@@ -37,7 +59,6 @@ export default function ContactPage() {
           <h1 className="text-4xl sm:text-5xl font-bold text-[#1A2217] mb-2">
             Get In <span className="text-[#FFB500]">Touch</span>
           </h1>
-          {/* Desktop: one line, Mobile: normal wrapping */}
           <p className="text-gray-600 text-sm sm:text-base max-w-2xl mx-auto sm:whitespace-nowrap sm:overflow-hidden sm:text-ellipsis">
             Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
           </p>
@@ -96,9 +117,10 @@ export default function ContactPage() {
 
               <button
                 type="submit"
-                className="w-full bg-[#FFB500] text-[#1A2217] py-2.5 rounded-lg font-bold text-sm hover:bg-[#FFC500] transition transform hover:scale-[1.02] shadow-md"
+                disabled={loading}
+                className="w-full bg-[#FFB500] text-[#1A2217] py-2.5 rounded-lg font-bold text-sm hover:bg-[#FFC500] transition transform hover:scale-[1.02] shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Send Message
+                {loading ? 'Sending...' : 'Send Message'}
               </button>
             </form>
           </div>

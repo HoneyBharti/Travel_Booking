@@ -34,19 +34,19 @@ const Herosection = () => {
 
   return (
     <section
-      className="relative w-full min-h-screen sm:min-h-[550px] md:min-h-[650px] lg:min-h-screen flex items-center overflow-hidden bg-cover bg-center"
+      className="relative w-full min-h-screen sm:min-h-[550px] md:min-h-[650px] lg:min-h-screen flex items-center bg-cover bg-center"
       style={{
         backgroundImage: "url('/herobg.png')",
       }}
     >
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/40"></div>
+      <div className="absolute inset-0 bg-black/40 mobile-overlay"></div>
 
       {/* CONTENT SECTION */}
-      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 z-10 flex flex-col justify-center min-h-screen pt-16 sm:pt-0">
+      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 z-10 flex flex-col justify-center min-h-screen pt-16 sm:pt-0 mobile-content">
         
         {/* Heading - Mobile (≤640px) */}
-        <div className="block sm:hidden">
+        <div className="block sm:hidden mobile-heading">
           <div className="text-white text-3xl xs:text-4xl font-bold leading-tight">
             CHECK YOUR
           </div>
@@ -112,9 +112,10 @@ const Herosection = () => {
       </div>
 
       {/* TRAIN IMAGE - Fully Responsive */}
-      <div className="absolute right-0 z-10"
+      <div className="absolute  right-0 train-image-container"
            style={{
              top: 'clamp(5rem, 16vw, 12rem)',
+             zIndex: 5,
            }}>
         <img
           src="/herosectionimag.png"
@@ -130,7 +131,7 @@ const Herosection = () => {
       {/* Custom CSS */}
       <style>{`
         @media (min-width: 850px) and (max-width: 1234px) {
-          .absolute.right-0.z-10 {
+          .train-image-container {
             top: 3rem !important;
           }
         }
@@ -141,11 +142,34 @@ const Herosection = () => {
           }
         }
         
-        /* Only adjust image size for 300-340px width screens */
-        @media (min-width: 300px) and (max-width: 340px) {
-          .absolute.right-0.z-10 img {
-            height: 8rem !important;
-            max-height: 8rem !important;
+        /* Mobile screens - Full width train image at top */
+        @media (max-width: 639px) {
+          .mobile-overlay {
+            z-index: 1 !important;
+          }
+          
+          .train-image-container {
+            top: 6rem !important;
+            right: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            display: flex;
+            justify-content: center;
+            z-index: 998 !important;
+            overflow: visible !important;
+          }
+          
+          .train-image-container img {
+            width: 100% !important;
+            height: auto !important;
+            min-height: 180px !important;
+            max-height: none !important;
+            object-fit: contain !important;
+            object-position: center center !important;
+          }
+          
+          .mobile-content {
+            padding-top: 27rem !important;
           }
         }
       `}</style>
